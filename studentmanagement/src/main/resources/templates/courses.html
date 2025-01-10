@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+  <meta charset="UTF-8">
+  <title>Student Management System</title>
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+        crossorigin="anonymous">
+</head>
+<body>
+<nav class="navbar navbar-expand-md bg-dark navbar-dark">
+  <!-- Brand -->
+  <a class="navbar-brand" href="#">Student Management System</a>
+
+  <!-- Toggler/collapsibe Button -->
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <!-- Navbar links -->
+  <div class="collapse navbar-collapse" id="collapsibleNavbar">
+    <ul class="navbar-nav d-flex">
+      <li class="nav-item">
+        <a class="nav-link" th:href="@{/}">Home</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" th:href="@{/students}">Student Management</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" th:href="@{/teachers}">Teacher Management</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" th:href="@{/courses}">Courses Management</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link active" th:href="@{/assignments}">Assignments</a>
+      </li>
+    </ul>
+    <ul class="navbar-nav ml-auto d-flex align-items-center">
+      <li class="nav-item">
+        <a class="nav-link" th:href="@{/user/details}">Profilul Meu</a>
+      </li>
+      <li class="nav-item">
+        <form th:action="@{/logout}" method="post" style="display:inline;">
+          <button type="submit" class="btn btn-danger ml-2">Log Out</button>
+        </form>
+      </li>
+    </ul>
+  </div>
+</nav>
+<div class = "container">
+  <div class = "row">
+    <h1> Lista Cursuri</h1>
+  </div>
+  <div th:if="${message}" class="alert alert-info" th:text="${message}"></div>
+  <div class = "row">
+    <div class = "col-lg-3">
+      <a sec:authorize="hasRole('ROLE_ADMIN')" th:href="@{/courses/new}" class="btn btn-primary btm-sm mb-3">Adauga Curs</a>
+    </div>
+  </div>
+  <table class = "table table-striped table-dark table-bordered">
+    <thead class = "table-dark">
+    <tr>
+      <th>Denumire Curs</th>
+      <th>Titular Curs</th>
+      <th>Numar Credite</th>
+      <th>Actiuni</th>
+      <th>Vezi Cursuri</th>
+      <th>Adauga PDF</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each = "course: ${courses}">
+      <td th:text = "${course.denumire}"></td>
+      <td th:text = "${course.teacher.nume} + ' ' + ${course.teacher.prenume}"></td>
+      <td th:text = "${course.nrCredite}"></td>
+      <td>
+        <a sec:authorize="hasRole('ROLE_ADMIN')" th:href="@{/courses/edit/{id}(id=${course.id})}" class="btn btn-primary btm-sm mb-3">Update</a>
+        <a sec:authorize="hasRole('ROLE_ADMIN')" th:href="@{/courses/{id}(id=${course.id})}" class="btn btn-danger btm-sm mb-3">Sterge</a>
+      </td>
+      <td>
+        <div th:if="${course.files != null}">
+          <div th:each="file : ${course.files}" class="mb-2">
+            <div class="d-flex align-items-center">
+              <a th:href="@{/view-pdf/{id}(id=${file.id})}" class="btn btn-info mr-2" target="_blank">
+                Vezi PDF: <span th:text="${file.fileName}"></span>
+              </a>
+
+              <form sec:authorize="hasRole('ROLE_ADMIN')" th:action="@{/delete-pdf/{id}(id=${file.id})}" method="post" style="display:inline;">
+                <input type="hidden" name="courseId" th:value="${course.id}" />
+                <button type="submit" class="btn btn-danger btn-sm">Șterge PDF</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </td>
+
+      <td>
+        <form sec:authorize="hasRole('ROLE_ADMIN')" th:action="@{/upload}" method="post" enctype="multipart/form-data">
+          <input type="hidden" name="courseId" th:value="${course.id}" />
+          <input type="file" name="file" accept="application/pdf" class="form-control-file mb-2" />
+          <button type="submit" class="btn btn-secondary">Upload PDF</button>
+        </form>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+</body>
+</html>

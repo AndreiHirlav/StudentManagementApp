@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Assignment</title>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+          crossorigin="anonymous">
+</head>
+<body>
+<nav class="navbar navbar-expand-md navbar-dark bg-dark">
+    <a class="navbar-brand" href="#">Student Management System</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+            <li class="nav-item"><a class="nav-link" th:href="@{/}">Home</a></li>
+            <li class="nav-item"><a class="nav-link" th:href="@{/students}">Student Management</a></li>
+            <li class="nav-item"><a class="nav-link" th:href="@{/teachers}">Teacher Management</a></li>
+            <li class="nav-item"><a class="nav-link" th:href="@{/courses}">Courses Management</a></li>
+            <li class="nav-item"><a class="nav-link" th:href="@{/assignments}">Assignments</a></li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container mt-5">
+    <h2 class="mb-4">Edit Assignment</h2>
+    <form th:action="@{/assignments/{id}/edit(id=${assignment.id})}" method="post">
+        <div class="form-group">
+            <label for="name">Nume Assignment</label>
+            <input type="text" class="form-control" id="name" name="name" th:value="${assignment.name}" required>
+        </div>
+        <div class="form-group">
+            <label for="subject">Materie</label>
+            <input type="text" class="form-control" id="subject" name="subject" th:value="${assignment.subject}" required>
+        </div>
+        <div class="form-group">
+            <label for="deadline">Deadline</label>
+            <input type="date" class="form-control" id="deadline" name="deadline"
+                   th:value="${assignment.deadline != null ? #temporals.format(assignment.deadline, 'yyyy-MM-dd') : ''}" required>
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">Salveaza</button>
+            <a th:href="@{/assignments}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFwMvUjAGlNt65R20D5Kn8vY+0M"
+        crossorigin="anonymous"></script>
+</body>
+</html>

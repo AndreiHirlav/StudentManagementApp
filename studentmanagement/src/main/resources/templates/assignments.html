@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+    <meta charset="UTF-8">
+    <title>Assignments Management</title>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+          crossorigin="anonymous">
+</head>
+<body>
+<nav class="navbar navbar-expand-md bg-dark navbar-dark">
+    <a class="navbar-brand" href="#">Student Management System</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="collapsibleNavbar">
+        <ul class="navbar-nav d-flex">
+            <li class="nav-item"><a class="nav-link" th:href="@{/}">Home</a></li>
+            <li class="nav-item"><a class="nav-link" th:href="@{/students}">Student Management</a></li>
+            <li class="nav-item"><a class="nav-link" th:href="@{/teachers}">Teacher Management</a></li>
+            <li class="nav-item"><a class="nav-link" th:href="@{/courses}">Courses Management</a></li>
+            <li class="nav-item"><a class="nav-link active" th:href="@{/assignments}">Assignments</a></li>
+        </ul>
+        <ul class="navbar-nav ml-auto d-flex align-items-center">
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/user/details}">Profilul Meu</a>
+            </li>
+            <li class="nav-item">
+                <form th:action="@{/logout}" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-danger ml-2">Log Out</button>
+                </form>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="row">
+        <h1>Lista Temelor</h1>
+    </div>
+    <div th:if="${message}" class="alert alert-info" th:text="${message}"></div>
+    <div class="row">
+        <div class="col-lg-3">
+            <a sec:authorize="hasRole('ROLE_ADMIN')" th:href="@{/assignments/new}" class="btn btn-primary btn-sm mb-3">Adauga Tema</a>
+        </div>
+    </div>
+    <table class="table table-striped table-dark table-bordered">
+        <thead class="table-dark">
+        <tr>
+            <th>Denumire Tema</th>
+            <th>Materie</th>
+            <th>Termen Limita</th>
+            <th>Fisiere Atașate</th>
+            <th>Actiuni</th>
+            <th>Adauga Fisier</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="assignment : ${assignments}">
+            <td th:text="${assignment.name}"></td>
+            <td th:text="${assignment.subject}"></td>
+            <td th:text="${#temporals.format(assignment.deadline, 'dd/MM/yyyy')}"></td>
+            <td>
+                <!-- Afisarea fișierelor -->
+                <div th:each="file : ${assignment.files}">
+                    <!-- Vizibil pentru ROLE_ADMIN sau pentru utilizatorul care a încărcat fișierul -->
+                    <div class="d-flex align-items-center mb-2"
+                         sec:authorize="hasRole('ROLE_ADMIN') or #authentication.name == file.uploadedBy">
+                        <a th:href="@{/assignments/download-file/{id}(id=${file.id})}" class="btn btn-info mr-2">
+                            Vezi Fisier: <span th:text="${file.fileName}"></span>
+                        </a>
+                        <!-- Afișează cine a încărcat fișierul (doar pentru ROLE_ADMIN) -->
+                        <span class="ml-2" sec:authorize="hasRole('ROLE_ADMIN')">
+                            Încărcat de: <span th:text="${file.uploadedBy}"></span>
+                        </span>
+                        <!-- Șterge fișier (doar pentru ROLE_ADMIN) -->
+                        <form sec:authorize="hasRole('ROLE_ADMIN')"
+                              th:action="@{/assignments/{id}/delete-file(id=${assignment.id})}"
+                              method="post" style="display:inline;">
+                            <input type="hidden" name="fileName" th:value="${file.fileName}" />
+                            <button type="submit" class="btn btn-danger btn-sm ml-2">Șterge Fișier</button>
+                        </form>
+                    </div>
+                </div>
+            </td>
+            <td>
+                <div class="d-flex">
+                    <a sec:authorize="hasRole('ROLE_ADMIN')" th:href="@{/assignments/{id}/edit(id=${assignment.id})}" class="btn btn-primary btn-sm mr-2">Update</a>
+                    <form sec:authorize="hasRole('ROLE_ADMIN')" th:action="@{/assignments/{id}/delete(id=${assignment.id})}" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm">Sterge</button>
+                    </form>
+                </div>
+            </td>
+            <td>
+                <form sec:authorize="hasAnyRole('ROLE_USER', 'ROLE_ADMIN')"
+                      th:action="@{/assignments/{id}/upload(id=${assignment.id})}"
+                      method="post"
+                      enctype="multipart/form-data">
+                    <input type="hidden" name="assignmentId" th:value="${assignment.id}" />
+                    <input type="file" name="file" class="form-control-file mb-2" />
+                    <button type="submit" class="btn btn-secondary">Upload File</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFwMvUjAGlNt65R20D5Kn8vY+0M"
+        crossorigin="anonymous"></script>
+</body>
+</html>

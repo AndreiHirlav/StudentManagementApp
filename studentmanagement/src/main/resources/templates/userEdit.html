@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Editează Profilul</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+  <h2>Editează Profilul</h2>
+  <form th:action="@{/user/update}" th:object="${user}" method="post">
+    <div class="form-group">
+      <label for="nume">Nume</label>
+      <input type="text" id="nume" th:field="*{nume}" class="form-control" />
+    </div>
+    <div class="form-group">
+      <label for="prenume">Prenume</label>
+      <input type="text" id="prenume" th:field="*{prenume}" class="form-control" />
+    </div>
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input type="email" id="email" th:field="*{email}" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-success">Salvează</button>
+    <a th:href="@{/user/details}" class="btn btn-secondary">Anulează</a>
+  </form>
+</div>
+</body>
+</html>
